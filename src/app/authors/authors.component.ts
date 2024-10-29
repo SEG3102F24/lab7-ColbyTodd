@@ -1,38 +1,22 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Author} from '../model/author';
-import {AuthorsService} from '../service/authors.service';
-import {Subscription} from "rxjs";
-import { NgIf } from '@angular/common';
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router, Routes, RouterOutlet } from '@angular/router';
+import {AuthorComponent} from './author/author.component';
+
+export const authorsRoutes: Routes = [
+  {path: ':id', component: AuthorComponent}
+];
 
 @Component({
   selector: 'app-authors',
   standalone: true,
-  imports: [],
+  imports: [RouterOutlet],
   templateUrl: './authors.component.html',
   styleUrl: './authors.component.css'
 })
 export class AuthorsComponent {
-  selectedAuthor!: Author | null;
-  private subscription!: Subscription;
-  private route: ActivatedRoute = inject(ActivatedRoute);
-  private authorsService: AuthorsService = inject(AuthorsService);
+  constructor(private router: Router, private route: ActivatedRoute) { }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      const id = params['id'];
-      this.subscription = this.authorsService.getBook(id).subscribe({
-        next: (data: Author) => {
-          this.selectedAuthor = data;
-        },
-        error: (_: any) => {
-          this.selectedAuthor = null;
-        }
-      });
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  submit(value: string): void {
+    this.router.navigate(['./', value], {relativeTo: this.route}).then(r => {});
   }
 }
